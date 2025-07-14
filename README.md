@@ -1,90 +1,95 @@
-# 中文 | [English](README_en.md)
+# 英文 | [中文](README_cn.md)
 # rl-deploy-with-python
 
+## 1. Running the Simulation
 
+- Open a Bash terminal.
 
-## 1. 运行仿真
+- Clone the MuJoCo simulator code:
 
-- 打开一个 Bash 终端。
-
-- 下载 MuJoCo 仿真器代码：
-
-  ```
+  ```bash
   git clone --recurse https://github.com/limxdynamics/pointfoot-mujoco-sim.git
   ```
 
-- 安装运动控制开发库（如果尚未安装）：
+- Install the motion control development library (if not already installed):
 
-  - Linux x86_64 环境
+  - For Linux x86_64 environment:
 
-    ```
+    ```bash
     pip install pointfoot-mujoco-sim/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
     ```
 
-  - Linux aarch64 环境
+  - For Linux aarch64 environment:
 
-    ```
+    ```bash
     pip install pointfoot-mujoco-sim/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
     ```
 
-- 设置机器人类型
+- Set the robot type:
 
-  - 通过 Shell 命令 `tree -L 1 pointfoot-mujoco-sim/robot-description/pointfoot` 列出可用的机器人类型：
-  
+  - List the available robot types using the Shell command:
+
+    ```bash
+    tree -L 1 pointfoot-mujoco-sim/robot-description/pointfoot
     ```
-    limx@limx:~$ tree -L 1 pointfoot-mujoco-sim/robot-description/pointfoot
+
+    Example output:
+
+    ```plaintext
     pointfoot-mujoco-sim/robot-description/pointfoot
     ├── PF_P441A
     ├── PF_P441B
     ├── PF_P441C
     └── PF_P441C2
-    
     ```
-  
-  - 以`PF_P441C`（请根据实际机器人类型进行替换）为例，设置机器人型号类型：
-  
-    ```
+
+  - Set the robot model type (using `PF_P441C` as an example; replace with your actual robot type):
+
+    ```bash
     echo 'export ROBOT_TYPE=PF_P441C' >> ~/.bashrc && source ~/.bashrc
     ```
-  
-- 运行 MuJoCo 仿真器：
 
-  ```
+- Run the MuJoCo simulator:
+
+  ```bash
   python pointfoot-mujoco-sim/simulator.py
   ```
-  
 
+## 2. Running the Control Algorithm
 
-## 2. 运行控制算法
+- Open a Bash terminal.
 
-- 打开一个 Bash 终端。
+- Clone the control algorithm code:
 
-- 下载控制算法代码：
-
-  ```
+  ```bash
   git clone --recurse https://github.com/limxdynamics/rl-deploy-with-python.git
   ```
-  
-- 安装运动控制开发库（如果尚未安装）：
 
-  - Linux x86_64 环境
+- Install the motion control development library (if not already installed):
 
-    ```
+  - For Linux x86_64 environment:
+
+    ```bash
     pip install rl-deploy-with-python/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
     ```
 
-  - Linux aarch64 环境
+  - For Linux aarch64 environment:
 
-    ```
+    ```bash
     pip install rl-deploy-with-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
     ```
 
-- 设置机器人类型
+- Set the robot type:
 
-  - 通过 Shell 命令 `tree -L 1 rl-deploy-with-python/controllers/model` 列出可用的机器人类型：
+  - List the available robot types using the Shell command:
 
+    ```bash
+    tree -L 1 rl-deploy-with-python/controllers/model
     ```
-    limx@limx:~$ tree -L 1 rl-deploy-with-python/controllers/model
+
+    Example output:
+
+    ```plaintext
     rl-deploy-with-python/controllers/model
     ├── PF_P441A
     ├── PF_P441B
@@ -93,31 +98,30 @@
     ├── PF_TRON1A
     ├── SF_TRON1A
     └── WF_TRON1A
-    
     ```
 
-  - 以`PF_P441C`（请根据实际机器人类型进行替换）为例，设置机器人型号类型：
+  - Set the robot model type (using `PF_P441C` as an example; replace with your actual robot type):
 
-    ```
+    ```bash
     echo 'export ROBOT_TYPE=PF_P441C' >> ~/.bashrc && source ~/.bashrc
     ```
 
-- 运行控制算法：
+- Run the control algorithm:
 
-  ```
+  ```bash
   python rl-deploy-with-python/main.py
   ```
 
-## 3. 虚拟遥控器
+## 3. Virtual Joystick
 
-- 打开一个 Bash 终端。
+- Open a Bash terminal.
 
-- 运行 robot-joystick：
+- Run the robot-joystick:
 
-  ```
+  ```bash
   ./pointfoot-mujoco-sim/robot-joystick/robot-joystick
   ```
 
-## 4. 效果展示
-![](doc/simulator.gif)
+## 4. Demonstration of Results
 
+![](doc/simulator.gif)
