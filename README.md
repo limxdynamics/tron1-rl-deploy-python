@@ -106,6 +106,14 @@
     echo 'export ROBOT_TYPE=PF_P441C' >> ~/.bashrc && source ~/.bashrc
     ```
 
+- Select training environment
+  
+  The currently supported training environments are isaacgym and isaaclab. Taking isaacgym as an example, set the training environment type:
+  
+  ```
+  echo 'export RL_TYPE=isaacgym' >> ~/.bashrc && source ~/.bashrc
+  ```
+  
 - Run the control algorithm:
 
   ```bash

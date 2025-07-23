@@ -102,6 +102,14 @@
     echo 'export ROBOT_TYPE=PF_P441C' >> ~/.bashrc && source ~/.bashrc
     ```
 
+- 选择训练环境
+  
+  目前支持的训练环境有`isaacgym`和`isaaclab`，以`isaacgym`为例，设置训练环境类型
+  
+  ```
+  echo 'export RL_TYPE=isaacgym' >> ~/.bashrc && source ~/.bashrc
+  ```
+  
 - 运行控制算法：
 
   ```

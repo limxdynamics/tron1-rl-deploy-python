@@ -14,15 +14,16 @@ import limxsdk.robot.RobotType as RobotType
 import limxsdk.datatypes as datatypes
 
 class SolefootController:
-    def __init__(self, model_dir, robot, robot_type, start_controller):
+    def __init__(self, model_dir, robot, robot_type, rl_type, start_controller):
         # Initialize robot and type information
         self.robot = robot
         self.robot_type = robot_type
+        self.rl_type = rl_type
 
         # Load configuration and model file paths based on robot type
         self.config_file = f'{model_dir}/{self.robot_type}/params.yaml'
-        self.model_policy = f'{model_dir}/{self.robot_type}/policy/policy.onnx'
-        self.model_encoder = f'{model_dir}/{self.robot_type}/policy/encoder.onnx'
+        self.model_policy = f'{model_dir}/{self.robot_type}/policy/{self.rl_type}/policy.onnx'
+        self.model_encoder = f'{model_dir}/{self.robot_type}/policy/{self.rl_type}/encoder.onnx'
 
         # Load configuration settings from the YAML file
         self.load_config(self.config_file)
@@ -219,6 +220,10 @@ class SolefootController:
             action_max = self.rl_cfg['clip_scales']['clip_actions']
             self.actions = np.clip(self.actions, action_min, action_max)
 
+            # swap actions positions back to deep first, only when action updated
+            if self.rl_type == "isaaclab":
+                self.actions = self.swap_positions(self.actions, reverse=True)
+
         # Iterate over the joints and set commands based on actions
         joint_pos = np.array(self.robot_state_tmp.q)
         joint_vel = np.array(self.robot_state_tmp.dq)
@@ -252,6 +257,16 @@ class SolefootController:
                 velocity_des = self.actions[i] * self.ankle_joint_damping
                 self.set_joint_command(i, 0, velocity_des, 0, 0, self.ankle_joint_damping)
 
+    def swap_positions(self, initial_array, reverse=False):
+        joint_idx_lab = [0, 4, 1, 5, 2, 6, 3, 7]
+        new_array = np.zeros(initial_array.shape)
+        for i in range(len(joint_idx_lab)):
+            if not reverse:
+                new_array[i] = initial_array[joint_idx_lab[i]]
+            else:
+                new_array[joint_idx_lab[i]] = initial_array[i]
+        return new_array
+    
     def compute_observation(self):
         # Convert IMU orientation from quaternion to Euler angles (ZYX convention)
         imu_orientation = np.array(self.imu_data_tmp.quat)
@@ -292,9 +307,16 @@ class SolefootController:
 
         # Apply scaling to the command inputs (velocity commands)
         self.scaled_commands = np.dot(command_scaler, self.commands)
+        if self.rl_type == "isaaclab":
+            self.scaled_commands = self.scaled_commands[:-2]
 
         # Populate observation vector
         joint_pos_input = (joint_positions - self.init_joint_angles) * self.obs_scales['dof_pos']
+        # swap positions in joint_pos, joint_vel and actions if mode is isaaclab
+        if self.rl_type == "isaaclab":
+            joint_pos_input = self.swap_positions(joint_pos_input)
+            joint_velocities = self.swap_positions(joint_velocities)
+            actions = self.swap_positions(actions)
 
         # Create the observation vector by concatenating various state variables:
         # - Base angular velocity (scaled)

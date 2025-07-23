@@ -14,15 +14,16 @@ import limxsdk.robot.RobotType as RobotType
 import limxsdk.datatypes as datatypes
 
 class WheelfootController:
-    def __init__(self, model_dir, robot, robot_type, start_controller):
+    def __init__(self, model_dir, robot, robot_type, rl_type, start_controller):
         # Initialize robot and type information
         self.robot = robot
         self.robot_type = robot_type
+        self.rl_type = rl_type
 
         # Load configuration and model file paths based on robot type
         self.config_file = f'{model_dir}/{self.robot_type}/params.yaml'
-        self.model_policy = f'{model_dir}/{self.robot_type}/policy/policy.onnx'
-        self.model_encoder = f'{model_dir}/{self.robot_type}/policy/encoder.onnx'
+        self.model_policy = f'{model_dir}/{self.robot_type}/policy/{self.rl_type}/policy.onnx'
+        self.model_encoder = f'{model_dir}/{self.robot_type}/policy/{self.rl_type}/encoder.onnx'
 
         # Load configuration settings from the YAML file
         self.load_config(self.config_file)
@@ -190,8 +191,8 @@ class WheelfootController:
 
     # Handle the stand mode for smoothly transitioning the robot into standing
     def handle_stand_mode(self):
-        self.init_state["hip_L_Joint"] = -0.9;
-        self.init_state["hip_R_Joint"] = 0.9;
+        self.init_state["hip_L_Joint"] = -0.9
+        self.init_state["hip_R_Joint"] = 0.9
         if self.stand_percent < 1:
             for j in range(len(self.joint_names)):
                 if (j + 1) % 4 != 0:
@@ -208,8 +209,8 @@ class WheelfootController:
 
     # Handle the walk mode where the robot moves based on computed actions
     def handle_walk_mode(self):
-        self.init_joint_angles[1] = 0.0;
-        self.init_joint_angles[5] = 0.0;
+        self.init_joint_angles[1] = 0.0
+        self.init_joint_angles[5] = 0.0
 
         # Update the temporary robot state and IMU data
         self.robot_state_tmp = copy.deepcopy(self.robot_state)
@@ -224,6 +225,10 @@ class WheelfootController:
             action_min = -self.rl_cfg['clip_scales']['clip_actions']
             action_max = self.rl_cfg['clip_scales']['clip_actions']
             self.actions = np.clip(self.actions, action_min, action_max)
+
+            # swap actions positions back to deep first, only when action updated
+            if self.rl_type == "isaaclab":
+                self.actions = self.swap_positions(self.actions, reverse=True)
 
         # Iterate over the joints and set commands based on actions
         joint_pos = np.array(self.robot_state_tmp.q)
@@ -258,6 +263,19 @@ class WheelfootController:
                 velocity_des = self.actions[i] * self.wheel_joint_damping
                 self.set_joint_command(i, 0, velocity_des, 0, 0, self.wheel_joint_damping)
 
+    def swap_positions(self, initial_array, reverse=False, exclude_wheel=False):
+        if not exclude_wheel:
+            joint_idx_lab = [0, 4, 1, 5, 2, 6, 3, 7]
+        else:
+            joint_idx_lab = [0, 3, 1, 4, 2, 5]
+        new_array = np.zeros(initial_array.shape)
+        for i in range(len(joint_idx_lab)):
+            if not reverse:
+                new_array[i] = initial_array[joint_idx_lab[i]]
+            else:
+                new_array[joint_idx_lab[i]] = initial_array[i]
+        return new_array
+    
     def compute_observation(self):
         # Convert IMU orientation from quaternion to Euler angles (ZYX convention)
         imu_orientation = np.array(self.imu_data_tmp.quat)
@@ -297,6 +315,11 @@ class WheelfootController:
 
         # In WF, joint pos does not include wheel speed, index(3, 7) needs to be removed
         joint_pos_input = np.array([joint_pos_value[idx] for idx in self.joint_pos_idxs])
+        # swap positions in joint_pos, joint_vel and actions if mode is isaaclab
+        if self.rl_type == "isaaclab":
+            joint_pos_input = self.swap_positions(joint_pos_input, exclude_wheel=True)
+            joint_velocities = self.swap_positions(joint_velocities)
+            actions = self.swap_positions(actions)
 
         # Create the observation vector by concatenating various state variables:
         # - Base angular velocity (scaled)
