@@ -249,13 +249,17 @@ class SolefootController:
                 # Save the last action for reference
                 self.last_actions[i] = self.actions[i]
             else:
-                action_min = joint_vel[i] - self.ankle_joint_torque_limit / self.ankle_joint_damping
-                action_max = joint_vel[i] + self.ankle_joint_torque_limit / self.ankle_joint_damping
+                action_min = (joint_pos[i] - self.init_joint_angles[i] +
+                              (self.ankle_joint_damping * joint_vel[i] - self.ankle_joint_torque_limit) /
+                              self.control_cfg['stiffness'])
+                action_max = (joint_pos[i] - self.init_joint_angles[i] +
+                              (self.ankle_joint_damping * joint_vel[i] + self.ankle_joint_torque_limit) /
+                              self.control_cfg['stiffness'])
                 self.last_actions[i] = self.actions[i]
-                self.actions[i] = max(action_min / self.ankle_joint_damping,
-                                      min(action_max / self.ankle_joint_damping, self.actions[i]))
-                velocity_des = self.actions[i] * self.ankle_joint_damping
-                self.set_joint_command(i, 0, velocity_des, 0, 0, self.ankle_joint_damping)
+                self.actions[i] = max(action_min / self.control_cfg['action_scale_pos'],
+                                      min(action_max / self.control_cfg['action_scale_pos'], self.actions[i]))
+                pos_des = self.actions[i] * self.control_cfg['action_scale_pos'] + self.init_joint_angles[i]
+                self.set_joint_command(i, pos_des, 0, 0, self.control_cfg['stiffness'], self.ankle_joint_damping)
 
     def swap_positions(self, initial_array, reverse=False):
         joint_idx_lab = [0, 4, 1, 5, 2, 6, 3, 7]
