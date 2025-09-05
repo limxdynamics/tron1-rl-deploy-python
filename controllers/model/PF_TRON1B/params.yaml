@@ -1,0 +1,58 @@
+PointfootCfg:
+  loop_frequency: 500
+  joint_names:
+    - "abad_L_Joint"
+    - "hip_L_Joint"
+    - "knee_L_Joint"
+    - "abad_R_Joint"
+    - "hip_R_Joint"
+    - "knee_R_Joint"
+  
+  init_state:
+    # target angles [rad] when action = 0.0
+    default_joint_angle:
+      abad_L_Joint: 0.0
+      hip_L_Joint: 0.0
+      knee_L_Joint: 0.0
+
+      abad_R_Joint: 0.0
+      hip_R_Joint: 0.0
+      knee_R_Joint: 0.0
+
+  control:
+    # PD Drive parameters:
+    stiffness: 42.0
+    damping: 3.5
+    action_scale_pos: 0.25
+    decimation: 10
+    user_torque_limit: 80
+
+  normalization:
+    clip_scales:
+      clip_observations: 100.
+      clip_actions: 100.
+    obs_scales:
+      lin_vel: 2.0
+      ang_vel: 0.25
+      dof_pos: 1.0
+      dof_vel: 0.05
+
+  size:
+    actions_size: 6
+    observations_size: 30
+    commands_size: 3
+    obs_history_length: 10
+    encoder_output_size: 3
+
+  stand_mode:
+    stand_duration: 1.0
+
+  imu_orientation_offset:
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+
+  user_cmd_scales:
+    lin_vel_x: 1.5
+    lin_vel_y: 1.0
+    ang_vel_yaw: 0.5
