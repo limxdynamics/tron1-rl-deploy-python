@@ -60,7 +60,7 @@
 
 ## 2. Running the Control Algorithm
 
-> This repository *is* the control algorithm code — no need to clone it again. From the repo root:
+> This repository *is* the control algorithm code — no need to clone it again. `cd` into your local clone of `tron1-rl-deploy-python`, then:
 
 - Open a Bash terminal in this repository.
 
