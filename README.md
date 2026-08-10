@@ -1,5 +1,5 @@
 # 英文 | [中文](README_cn.md)
-# rl-deploy-with-python
+# tron1-rl-deploy-python
 
 ## 1. Running the Simulation
 
@@ -8,7 +8,7 @@
 - Clone the MuJoCo simulator code:
 
   ```bash
-  git clone --recurse https://github.com/limxdynamics/pointfoot-mujoco-sim.git
+  git clone --recurse https://github.com/limxdynamics/tron1-mujoco-sim.git
   ```
 
 - Install the motion control development library (if not already installed):
@@ -16,13 +16,13 @@
   - For Linux x86_64 environment:
 
     ```bash
-    pip install pointfoot-mujoco-sim/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
+    pip install tron1-mujoco-sim/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
     ```
 
   - For Linux aarch64 environment:
 
     ```bash
-    pip install pointfoot-mujoco-sim/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
+    pip install tron1-mujoco-sim/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
     ```
 
 - Set the robot type:
@@ -30,13 +30,13 @@
   - List the available robot types using the Shell command:
 
     ```bash
-    tree -L 1 pointfoot-mujoco-sim/robot-description/pointfoot
+    tree -L 1 tron1-mujoco-sim/robot-description/pointfoot
     ```
 
     Example output:
 
     ```plaintext
-    pointfoot-mujoco-sim/robot-description/pointfoot
+    tron1-mujoco-sim/robot-description/pointfoot
     ├── PF_P441A
     ├── PF_P441B
     ├── PF_P441C
@@ -52,7 +52,7 @@
 - Run the MuJoCo simulator:
 
   ```bash
-  python pointfoot-mujoco-sim/simulator.py
+  python tron1-mujoco-sim/simulator.py
   ```
 
 ## 2. Running the Control Algorithm
@@ -62,7 +62,7 @@
 - Clone the control algorithm code:
 
   ```bash
-  git clone --recurse https://github.com/limxdynamics/rl-deploy-with-python.git
+  git clone --recurse https://github.com/limxdynamics/tron1-rl-deploy-python.git
   ```
 
 - Install the motion control development library (if not already installed):
@@ -70,13 +70,13 @@
   - For Linux x86_64 environment:
 
     ```bash
-    pip install rl-deploy-with-python/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
+    pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
     ```
 
   - For Linux aarch64 environment:
 
     ```bash
-    pip install rl-deploy-with-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
+    pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
     ```
 
 - Set the robot type:
@@ -84,13 +84,13 @@
   - List the available robot types using the Shell command:
 
     ```bash
-    tree -L 1 rl-deploy-with-python/controllers/model
+    tree -L 1 tron1-rl-deploy-python/controllers/model
     ```
 
     Example output:
 
     ```plaintext
-    rl-deploy-with-python/controllers/model
+    tron1-rl-deploy-python/controllers/model
     ├── PF_P441A
     ├── PF_P441B
     ├── PF_P441C
@@ -117,7 +117,7 @@
 - Run the control algorithm:
 
   ```bash
-  python rl-deploy-with-python/main.py
+  python tron1-rl-deploy-python/main.py
   ```
 
 ## 3. Virtual Joystick
@@ -127,7 +127,7 @@
 - Run the robot-joystick:
 
   ```bash
-  ./pointfoot-mujoco-sim/robot-joystick/robot-joystick
+  ./tron1-mujoco-sim/robot-joystick/robot-joystick
   ```
 
 ## 4. Demonstration of Results
