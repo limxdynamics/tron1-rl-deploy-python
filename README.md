@@ -1,4 +1,4 @@
-# 英文 | [中文](README_cn.md)
+# English | [中文](README_cn.md)
 # tron1-rl-deploy-python
 
 ## 1. Running the Simulation
