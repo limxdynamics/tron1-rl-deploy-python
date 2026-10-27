@@ -45,9 +45,10 @@ simulator or to a real robot.
 | <img src="doc/model_sf.png" width="260"> | Sole-foot | `SF_TRON1A`, `SF_TRON1B` | 8 / 8 |
 | <img src="doc/model_wf.png" width="260"> | Wheel-foot | `WF_TRON1A`, `WF_TRON1B` | 8 / 8 |
 
-Each model directory under `controllers/model/` holds `params.yaml` and
-`policy/{isaacgym,isaaclab}/{policy,encoder}.onnx`. The control loop runs at
-500 Hz and the policy at 50 Hz.
+Each model directory under `controllers/model/` holds `params.yaml` and the
+policy pair at `policy/$RL_TYPE/policy.onnx` and `policy/$RL_TYPE/encoder.onnx`.
+The control loop runs at 500 Hz and the policy at 50 Hz (`loop_frequency: 500`,
+`decimation: 10`).
 
 ## How it works
 
@@ -55,177 +56,72 @@ Each model directory under `controllers/model/` holds `params.yaml` and
   <img src="doc/sim2real_en.png" alt="The same ONNX policy drives TRON1 in MuJoCo by default and the real robot when you pass its IP address" width="100%">
 </p>
 
+<p align="center">
+  <img src="doc/simulator.gif" alt="TRON1 walking in tron1-mujoco-sim under this controller" width="400">
+</p>
+
 ## Quick start
 
-Simulation in two terminals (Linux x86_64; use `aarch64` in the wheel path
-on ARM):
+Linux x86_64 or aarch64, Python 3, CPU only. Run the commands below from the
+directory that holds both clones.
+
+**1. Clone this repository and the simulator.** Submodules carry the SDK, the
+robot descriptions and the virtual joystick.
 
 ```bash
 git clone --recurse-submodules https://github.com/limxdynamics/tron1-rl-deploy-python.git
 git clone --recurse-submodules https://github.com/limxdynamics/tron1-mujoco-sim.git
-pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
-pip install numpy pyyaml scipy onnxruntime mujoco
-export ROBOT_TYPE=PF_TRON1A RL_TYPE=isaacgym
-
-python tron1-mujoco-sim/simulator.py        # terminal 1
-python tron1-rl-deploy-python/main.py       # terminal 2, same exports
 ```
 
-The robot falls in the simulator until the controller runs. Once `main.py`
-is running, press Backspace in the MuJoCo window to reset the robot; it
-stands up and starts walking in place. Drive it with the virtual joystick
-(section 3).
+**2. Install the low-level SDK** — the wheel ships in the `limxsdk-lowlevel`
+submodule, so initialise it first if you cloned without `--recurse-submodules`
+(`git submodule update --init`):
 
-## 1. Running the Simulation
+```bash
+# Linux x86_64
+pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
+# Linux aarch64
+pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
+```
 
-- Open a Bash terminal.
+**3. Install the controller dependencies:**
 
-- Clone the MuJoCo simulator code:
+```bash
+pip install numpy pyyaml scipy onnxruntime mujoco
+```
 
-  ```bash
-  git clone --recurse https://github.com/limxdynamics/tron1-mujoco-sim.git
-  ```
+**4. Select the model and the policy source.** `ROBOT_TYPE` comes from the
+table above, `RL_TYPE` is `isaacgym` or `isaaclab`. Both terminals need both
+variables.
 
-- Install the motion control development library (if not already installed):
+```bash
+export ROBOT_TYPE=PF_TRON1A
+export RL_TYPE=isaacgym
+```
 
-  - For Linux x86_64 environment:
+**5. Start the simulator, then the controller** — one terminal each:
 
-    ```bash
-    pip install tron1-mujoco-sim/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
-    ```
+```bash
+python tron1-mujoco-sim/simulator.py      # terminal 1
+python tron1-rl-deploy-python/main.py     # terminal 2
+```
 
-  - For Linux aarch64 environment:
+The robot falls in the simulator until the controller is running. Once
+`main.py` is up, press **Backspace** in the MuJoCo window to reset the robot;
+it stands up and starts walking in place. Drive it with the virtual joystick
+below.
 
-    ```bash
-    pip install tron1-mujoco-sim/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
-    ```
+If `pip` refuses to install outside a virtual environment
+(`externally-managed-environment`), or the simulator needs more setup, see the
+[tron1-mujoco-sim README](https://github.com/limxdynamics/tron1-mujoco-sim).
 
-- Set the robot type:
+## Virtual joystick
 
-  - List the available robot types using the Shell command:
+```bash
+./tron1-mujoco-sim/robot-joystick/robot-joystick
+```
 
-    ```bash
-    tree -L 1 tron1-mujoco-sim/robot-description/pointfoot
-    ```
-
-    Example output:
-
-    ```plaintext
-    tron1-mujoco-sim/robot-description/pointfoot
-    ├── PF_P441A
-    ├── PF_P441B
-    ├── PF_P441C
-    ├── PF_P441C2
-    ├── PF_TRON1A
-    ├── PF_TRON1B
-    ├── SF_TRON1A
-    ├── SF_TRON1B
-    ├── WF_TRON1A
-    ├── WF_TRON1B
-    └── meshes_camera
-    ```
-
-  - Set the robot model type (using `PF_P441C` as an example; replace with your actual robot type):
-
-    ```bash
-    echo 'export ROBOT_TYPE=PF_P441C' >> ~/.bashrc && source ~/.bashrc
-    ```
-
-- Run the MuJoCo simulator:
-
-  ```bash
-  python tron1-mujoco-sim/simulator.py
-  ```
-
-## 2. Running the Control Algorithm
-
-> This repository *is* the control algorithm code — no need to clone it again. `cd` into your local clone of `tron1-rl-deploy-python`, then:
-
-- Open a Bash terminal in this repository.
-
-- If you cloned without `--recurse-submodules`, fetch the SDK submodule first:
-
-  ```bash
-  git submodule update --init
-  ```
-
-- Install the motion control development library (if not already installed):
-
-  - For Linux x86_64 environment:
-
-    ```bash
-    pip install limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
-    ```
-
-  - For Linux aarch64 environment:
-
-    ```bash
-    pip install limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
-    ```
-
-- Install the Python dependencies of the controllers:
-
-  ```bash
-  pip install numpy pyyaml scipy onnxruntime
-  ```
-
-- Set the robot type:
-
-  - List the available robot types using the Shell command:
-
-    ```bash
-    tree -L 1 controllers/model
-    ```
-
-    Example output:
-
-    ```plaintext
-    controllers/model
-    ├── PF_P441A
-    ├── PF_P441B
-    ├── PF_P441C
-    ├── PF_P441C2
-    ├── PF_TRON1A
-    ├── PF_TRON1B
-    ├── SF_TRON1A
-    ├── SF_TRON1B
-    ├── WF_TRON1A
-    └── WF_TRON1B
-    ```
-
-  - Set the robot model type (using `PF_P441C` as an example; replace with your actual robot type):
-
-    ```bash
-    echo 'export ROBOT_TYPE=PF_P441C' >> ~/.bashrc && source ~/.bashrc
-    ```
-
-- Select training environment
-
-  The currently supported training environments are isaacgym and isaaclab. Taking isaacgym as an example, set the training environment type:
-
-  ```bash
-  echo 'export RL_TYPE=isaacgym' >> ~/.bashrc && source ~/.bashrc
-  ```
-
-  The policy is loaded from `controllers/model/$ROBOT_TYPE/policy/$RL_TYPE/`.
-
-- Run the control algorithm:
-
-  ```bash
-  python main.py
-  ```
-
-## 3. Virtual Joystick
-
-- Open a Bash terminal.
-
-- Run the robot-joystick:
-
-  ```bash
-  ./tron1-mujoco-sim/robot-joystick/robot-joystick
-  ```
-
-Joystick axes, as read by the controllers:
+Axes, as read by the controllers:
 
 | Axis | Command | Range |
 |:-:|---|---|
@@ -233,10 +129,10 @@ Joystick axes, as read by the controllers:
 | `axes[0]` | Sideways | ±0.5 m/s |
 | `axes[2]` | Turn (yaw) | ±0.5 rad/s |
 
-## 4. Running on the Robot
+## Running on the robot
 
 Pass the robot's IP address to `main.py`, with `ROBOT_TYPE` and `RL_TYPE` set
-as in section 2:
+as in step 4:
 
 ```bash
 python main.py <robot-ip>
@@ -251,13 +147,7 @@ controller: it sends zero stiffness with damping on every joint and exits.
 |:-:|---|
 | L1 + Y | Start the controller (after calibration state `0`) |
 | L1 + X | Stop: zero stiffness, damping only, then exit |
-| Sticks | Velocity commands, see section 3 |
-
-## 5. Demonstration of Results
-
-<p align="center">
-  <img src="doc/simulator.gif" alt="TRON1 walking in tron1-mujoco-sim under this controller" width="400">
-</p>
+| Sticks | Velocity commands, see the joystick section |
 
 ## Verification
 
