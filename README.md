@@ -79,9 +79,9 @@ submodule, so initialise it first if you cloned without `--recurse-submodules`
 
 ```bash
 # Linux x86_64
-pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
+pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/amd64/limxsdk-*.whl
 # Linux aarch64
-pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
+pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*.whl
 ```
 
 **3. Install the controller dependencies:**

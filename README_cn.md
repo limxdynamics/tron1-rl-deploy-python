@@ -62,9 +62,9 @@ git clone --recurse-submodules https://github.com/limxdynamics/tron1-mujoco-sim.
 
 ```bash
 # Linux x86_64
-pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/amd64/limxsdk-*-py3-none-any.whl
+pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/amd64/limxsdk-*.whl
 # Linux aarch64
-pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*-py3-none-any.whl
+pip install tron1-rl-deploy-python/limxsdk-lowlevel/python3/aarch64/limxsdk-*.whl
 ```
 
 **3. 安装控制器的 Python 依赖：**
