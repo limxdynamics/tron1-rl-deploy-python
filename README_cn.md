@@ -12,6 +12,8 @@
   <img src="https://img.shields.io/badge/ONNX%20Runtime-CPU-2f6feb" alt="ONNX Runtime">
   <img src="https://img.shields.io/badge/simulator-MuJoCo-2f6feb" alt="MuJoCo">
   <img src="https://img.shields.io/badge/ROS-not%20required-2f6feb" alt="ROS not required">
+  <a href="https://huggingface.co/limxdynamics/tron1-rl-locomotion-policies"><img src="https://img.shields.io/badge/Hugging%20Face-tron1--rl--locomotion--policies-FFD21E?logo=huggingface&logoColor=black" alt="Hugging Face: tron1-rl-locomotion-policies"></a>
+  <a href="https://huggingface.co/spaces/limxdynamics/tron1-teleop"><img src="https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-TRON1%20Teleop-FF9D00?logo=huggingface&logoColor=white" alt="在线体验：TRON1 Teleop"></a>
   <a href="https://github.com/limxdynamics/limxdynamics/blob/main/doc/wechat_qr.png"><img src="https://img.shields.io/badge/%E5%BE%AE%E4%BF%A1-%E5%BC%80%E5%8F%91%E8%80%85%E7%A4%BE%E5%8C%BA-07C160?logo=wechat&logoColor=white" alt="微信开发者社区"></a>
 </p>
 <p align="center"><sub>合作采购请联系 <a href="mailto:opensource@limxdynamics.com">opensource@limxdynamics.com</a></sub></p>
